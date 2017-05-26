@@ -89,6 +89,7 @@ def UpdateParameters(Parameters):
     Log_PriorH = np.log(Parameters.H)
     Lag1_IDX = [0]+range(len(Log_PriorH)-1)
     Log_Lag1_PrioH = Log_PriorH.iloc[Lag1_IDX]
+
     def UpdateBeta():
         OldMean = Parameters.Beta['Mean']
         OldCov = Parameters.Beta['Cov']
@@ -122,7 +123,20 @@ def UpdateParameters(Parameters):
         return NewAlpha
     Parameters.Alpha = UpdateAlpha()
 
-    Parameters.Sigma_Sq
+    def UpdateSigma():
+        # this following updating algorithm comes from Page 420 in [Tsay; 2002]
+        Alpha = Parameters.Alpha['Value']
+        Lambda = Parameters.Sigma_Sq['Lambda']
+        m = Parameters.Sigma_Sq['m']
+        v = Log_PriorH - Alpha[0] - Alpha[1] * Log_Lag1_PrioH
+        Numerator = m*Lambda + np.sum(np.square(v))
+        Chi2Draw = rand.chisquare(df=m+len(Log_PriorH)-1)
+        NewValue = Numerator / Chi2Draw
+        NewSigma_Sq = Parameters.Sigma_Sq.copy()
+        NewSigma_Sq['Value'] = NewValue
+        return NewSigma_Sq
+    Parameters.Sigma_Sq = UpdateSigma()
+
     Parameters.H
 
 rwData = ReadData(SplitYear=2013)
