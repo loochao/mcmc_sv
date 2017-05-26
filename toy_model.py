@@ -6,9 +6,12 @@ Created on Fri May 26 02:55:27 2017
 """
 
 from __future__ import print_function
+
 import pandas as pd
 import numpy as np
 import numpy.random as rand
+
+from scipy.stats import gamma
 from numpy.linalg import inv as invert
 from datetime import datetime
 
@@ -66,7 +69,7 @@ class PriorParameters:
             sigma_sq_inv = rand.chisquare(DegreeOfFreedom)
             sigma_sq = dict()
             sigma_sq['Value'] = float(m * Lambda) / sigma_sq_inv
-            sigma_sq['Lamba'] = Lambda
+            sigma_sq['Lambda'] = Lambda
             sigma_sq['m'] = m
 
             return sigma_sq
@@ -88,13 +91,12 @@ def UpdateParameters(Parameters):
     R_Vec = TrainDF['vwretd']
     Log_PriorH = np.log(Parameters.H)
     Lag1_IDX = [0]+range(len(Log_PriorH)-1)
-    Log_Lag1_PrioH = Log_PriorH.iloc[Lag1_IDX]
+    Log_Lag1_PrioH = Log_PriorH[Lag1_IDX]
 
     def UpdateBeta():
+        # this following updating algorithm comes from Page 419 in [Tsay; 2002]
         OldMean = Parameters.Beta['Mean']
         OldCov = Parameters.Beta['Cov']
-
-        # this following updating algorithm comes from Page 419 in [Tsay; 2002]
         NewCov = invert(np.dot(np.transpose(X_Vec),X_Vec)+invert(OldCov))
         NewMean = np.dot(NewCov, np.dot(np.transpose(X_Vec), R_Vec) + np.dot(invert(OldCov),OldMean))
         NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov)
@@ -107,13 +109,14 @@ def UpdateParameters(Parameters):
     Parameters.Beta = UpdateBeta()
 
     def UpdateAlpha():
+        # this following updating algorithm comes from Page 420 in [Tsay; 2002]
         OldMean = Parameters.Alpha['Mean']
         OldCov = Parameters.Alpha['Cov']
+        Sigma_Sq = Parameters.Sigma_Sq['Value']
+        Z_Mat = np.array([[1]*len(Log_Lag1_PrioH),Log_Lag1_PrioH.tolist()])
+        NewCov = invert(np.dot(Z_Mat, np.transpose(Z_Mat))/Sigma_Sq + invert(OldCov))
+        NewMean = np.dot(NewCov, np.dot(Z_Mat, np.transpose(Log_PriorH))/Sigma_Sq + np.dot(invert(OldCov),OldMean))
 
-        # this following updating algorithm comes from Page 420 in [Tsay; 2002]
-        Z_Mat = np.ndarray([np.ones_like(Log_Lag1_PrioH),Log_Lag1_PrioH])
-        NewCov = invert(np.dot(Z_Mat, np.transpose(Z_Mat))/Parameters.Sigma_Sq + invert(OldCov))
-        NewMean = np.dot(NewCov, np.dot(Z_Mat, np.transpose(Log_PriorH))/Parameters.Sigma_Sq + np.dot(invert(OldCov),OldMean))
         NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov)
         NewAlpha = {
             'Value': NewValue,
@@ -137,9 +140,46 @@ def UpdateParameters(Parameters):
         return NewSigma_Sq
     Parameters.Sigma_Sq = UpdateSigma()
 
-    Parameters.H
+    def UpdateH():
+        Alpha = Parameters.Alpha['Value']
+        HVec = Parameters.H.tolist()[:]
+
+        def CalcPI(H_This, H_Minus, H_Plus):
+            PART1 = (R_Vec.iloc[idx] - X_Vec.iloc[idx] * Parameters.Beta['Value'][1]) ** 2 / (2 * H_This)
+
+            mu = Alpha[0] * (1 - Alpha[1]) + Alpha[1] * (np.log(H_Minus) + np.log(H_Plus)) / (1 + Alpha[1] ** 2)
+            sigma_sq = Parameters.Sigma_Sq['Value'] / (1 + Alpha[1] ** 2)
+            PART2 = (np.log(H_This) - mu) ** 2 / (2 * sigma_sq)
+
+            PI = H_This ** (-1.5) * np.exp(-PART1 - PART2)
+            return PI
+
+        for idx, H_This in enumerate(HVec):
+            if idx == len(HVec)-1 or idx == 0: continue # edge case for H_0 and H_n
+            H_Minus = HVec[idx-1]
+            H_Plus = HVec[idx+1]
+
+            # the following acception/rejection scheme is called 'Metropolis Algorithm'
+            Pi_Old = CalcPI(H_This, H_Minus, H_Plus)
+            Q_Old = gamma.pdf(H_This,1)
+
+            H_Draw = rand.gamma(1)
+            Pi_New = CalcPI(H_Draw, H_Minus, H_Plus)
+            Q_New = gamma.pdf(H_Draw,1)
+
+            if Q_New * Pi_Old <> 0:
+                AcceptProbability = 1
+            else:
+                AcceptProbability = min([Pi_New * Q_Old / Pi_Old * Q_New , 1])
+
+            if rand.uniform(low=0, high=1)<=AcceptProbability:  HVec[idx] = H_Draw
+
+        return HVec
+    Parameters.H = UpdateH()
 
 rwData = ReadData(SplitYear=2013)
 TrainDF=rwData.train[['vwretd','tbill']]
 Priors = PriorParameters(TrainDF)
-UpdateParameters(Priors)
+NRound = 100
+for round in range(NRound):
+    UpdateParameters(Priors)
