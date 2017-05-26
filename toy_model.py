@@ -27,13 +27,14 @@ class PriorParameters:
     def __init__(self, TrainSerie,Seed = rand.randint(1)):
         rand.seed(Seed)
         TrainLen = len(TrainSerie)
-
         Mu = rand.randn()
-
         def AlphaPrior():
             MeanVec = rand.rand(2)
             CovMat = np.abs(rand.rand(2, 2))
             Alpha = rand.multivariate_normal(mean=MeanVec,cov=CovMat)
+
+            Alpha.MeanVec = MeanVec
+            Alpha.CovMat = CovMat
             return Alpha
         Alpha = AlphaPrior()
         # this abs(Alpha_2) <= 1 constraint make sure our AR(1) for volatility is stationary
@@ -45,6 +46,9 @@ class PriorParameters:
             DegreeOfFreedom = TrainLen + m -1
             sigma_sq_inv = rand.chisquare(DegreeOfFreedom)
             sigma_sq = float(m * Lambda) / sigma_sq_inv
+
+            sigma_sq.Lamba = Lambda
+            sigma_sq.m = m
             return sigma_sq
         Sigma_Sq = SigmaPrior()
 
@@ -58,4 +62,11 @@ class PriorParameters:
         print('{0}\n[INFO] Finished initialization of parameters.'.format('=' * 20 + NOW() + '=' * 20))
 
 rwData = ReadData(SplitYear=2013)
-Priors = PriorParameters(TrainSerie=rwData.train['vwretd'])
+TrainSerie=rwData.train['vwretd']
+Priors = PriorParameters(TrainSerie)
+
+def UpdateParameters(Parameters=Priors):
+    Parameters.Mu = rand.randn()
+    Parameters.Alpha
+    Parameters.Sigma_Sq
+    Parameters.H
