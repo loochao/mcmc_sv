@@ -11,6 +11,9 @@ import numpy as np
 import numpy.random as rand
 from datetime import datetime
 
+def NOW():
+    return str(datetime.now())[:-7]
+
 class ReadData:
     def __init__(self,SplitYear=2013):
         file_loc = r"https://raw.githubusercontent.com/jiacheng0409/mcmc_sv/master/sp_daily.csv"
@@ -18,8 +21,7 @@ class ReadData:
         train_IDX = rwData['caldt'] > SplitYear*(10**4)
         self.train = rwData[train_IDX]
         self.test = rwData[~train_IDX]
-        NOW = str(datetime.now())[:-7]
-        print('{0}\n[INFO] Finished data importing.'.format('='*20+NOW+'='*20))
+        print('{0}\n[INFO] Finished data importing.'.format('='*20+NOW()+'='*20))
 
 class PriorParameters:
     def __init__(self, TrainSerie,Seed = rand.randint(1)):
@@ -53,8 +55,7 @@ class PriorParameters:
         self.Alpha = Alpha
         self.Sigma_Sq = Sigma_Sq
         self.H = H
-        NOW = str(datetime.now())[:-7]
-        print('{0}\n[INFO] Finished initialization of parameters.'.format('=' * 20 + NOW + '=' * 20))
+        print('{0}\n[INFO] Finished initialization of parameters.'.format('=' * 20 + NOW() + '=' * 20))
 
 rwData = ReadData(SplitYear=2013)
 Priors = PriorParameters(TrainSerie=rwData.train['vwretd'])
