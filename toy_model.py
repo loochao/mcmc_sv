@@ -185,3 +185,5 @@ NRound = 100
 for round in range(NRound):
     UpdateParameters(Priors)
     print('{0}\n[INFO] Finished {1}th round of updating parameters using MCMC.'.format('='*20+NOW()+'='*20, round+1))
+
+print('{0}\n[INFO] Successfully exit the program.'.format('='*20+NOW()+'='*20))
