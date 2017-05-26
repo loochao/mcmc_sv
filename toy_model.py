@@ -9,6 +9,7 @@ from __future__ import print_function
 import pandas as pd
 import numpy as np
 import numpy.random as rand
+from numpy.linalg import inv as invert
 from datetime import datetime
 
 def NOW():
@@ -74,6 +75,7 @@ class PriorParameters:
         Epsilon_vec = rand.randn(TrainLen)
         # this following initialization of H comes from Eq. (10.20) in [Tsay; 2002]
         H = np.square((TrainData['vwretd'] - Beta['Value'][0] - Beta['Value'][1] * TrainData['tbill']) / Epsilon_vec)
+        H[H == 0] = 1e-5 # because we wish to calculate log of H_i's, we need to avoid zeros
 
         self.Beta = Beta
         self.Alpha = Alpha
@@ -84,26 +86,39 @@ class PriorParameters:
 def UpdateParameters(Parameters):
     X_Vec = TrainDF['tbill']
     R_Vec = TrainDF['vwretd']
-    Prior_H_Vec = Parameters.H
-    Prior_H_Lag1_Vec = pd.concat(Prior_H_Vec[0],Prior_H_Vec[:-1])
+    Log_PriorH = np.log(Parameters.H)
+    Lag1_IDX = [0]+range(len(Log_PriorH)-1)
+    Log_Lag1_PrioH = Log_PriorH.iloc[Lag1_IDX]
     def UpdateBeta():
         OldMean = Parameters.Beta['Mean']
         OldCov = Parameters.Beta['Cov']
+
         # this following updating algorithm comes from Page 419 in [Tsay; 2002]
-        NewCov = np.invert(np.dot(np.transpose(X_Vec),X_Vec)+np.invert(OldCov))
-        NewMean = np.dot(NewCov, np.dot(np.transpose(X_Vec), R_Vec) + np.dot(np.invert(OldCov),OldMean))
-        NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov,size=2)
-        NewBeta = dict()
-        NewBeta['Value'] = NewValue
-        NewBeta['Mean'] = NewMean
-        NewBeta['Cov'] = NewCov
+        NewCov = invert(np.dot(np.transpose(X_Vec),X_Vec)+invert(OldCov))
+        NewMean = np.dot(NewCov, np.dot(np.transpose(X_Vec), R_Vec) + np.dot(invert(OldCov),OldMean))
+        NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov)
+        NewBeta = {
+            'Value' : NewValue,
+            'Mean' : NewMean,
+            'Cov' : NewCov
+        }
         return NewBeta
     Parameters.Beta = UpdateBeta()
 
     def UpdateAlpha():
+        OldMean = Parameters.Alpha['Mean']
+        OldCov = Parameters.Alpha['Cov']
+
         # this following updating algorithm comes from Page 420 in [Tsay; 2002]
-        Z_Mat = pd.concat([np.ones_like(Prior_H_Vec), Prior_H_Lag1_Vec], axis=1)
-        NewAlpha = 0
+        Z_Mat = np.ndarray([np.ones_like(Log_Lag1_PrioH),Log_Lag1_PrioH])
+        NewCov = invert(np.dot(Z_Mat, np.transpose(Z_Mat))/Parameters.Sigma_Sq + invert(OldCov))
+        NewMean = np.dot(NewCov, np.dot(Z_Mat, np.transpose(Log_PriorH))/Parameters.Sigma_Sq + np.dot(invert(OldCov),OldMean))
+        NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov)
+        NewAlpha = {
+            'Value': NewValue,
+            'Mean': NewMean,
+            'Cov': NewCov
+        }
         return NewAlpha
     Parameters.Alpha = UpdateAlpha()
 
