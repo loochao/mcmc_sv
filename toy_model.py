@@ -31,12 +31,6 @@ class ReadData:
         self.test = rwData[~train_IDX]
         print('{0}\n[INFO] Finished data importing.'.format('='*20+NOW()+'='*20))
 
-class JointlyGussian:
-    def __init__(self,Value,Mean,Cov):
-        self.Value = Value
-        self.Mean = Mean
-        self.Cov = Cov
-
 class PriorParameters:
     def __init__(self, TrainData,Seed = rand.randint(1)):
         rand.seed(Seed)
@@ -45,38 +39,41 @@ class PriorParameters:
         def BetaPrior():
             MeanVec = rand.rand(2)
             CovMat = np.abs(rand.rand(2, 2))
-            Beta = JointlyGussian(Value=rand.multivariate_normal(mean=MeanVec, cov=CovMat,size=2),
-                                  Mean=MeanVec,
-                                  Cov=CovMat)
+            Beta = dict()
+            Beta['Value'] = rand.multivariate_normal(mean=MeanVec, cov=CovMat)
+            Beta['Mean'] = MeanVec
+            Beta['Cov'] = CovMat
             return Beta
         Beta = BetaPrior()
 
         def AlphaPrior():
             MeanVec = rand.rand(2)
             CovMat = np.abs(rand.rand(2, 2))
-            Alpha = JointlyGussian(Value=rand.multivariate_normal(mean=MeanVec,cov=CovMat,size=2),
-                                   Mean=MeanVec,
-                                   Cov=CovMat)
+            Alpha = dict()
+            Alpha['Value'] = rand.multivariate_normal(mean=MeanVec,cov=CovMat)
+            Alpha['Mean'] = MeanVec
+            Alpha['Cov'] = CovMat
             return Alpha
         Alpha = AlphaPrior()
         # this abs(Alpha_2) <= 1 constraint makes sure that our AR(1) for volatility is stationary
-        while np.abs(Alpha[1]>=1):  Alpha = AlphaPrior()
+        while np.abs(Alpha['Value'][1]>=1):  Alpha = AlphaPrior()
 
         def SigmaPrior():
             Lambda = rand.randn()
             m = rand.randint(low=1,high=10)
             DegreeOfFreedom = TrainLen + m -1
             sigma_sq_inv = rand.chisquare(DegreeOfFreedom)
-            sigma_sq = float(m * Lambda) / sigma_sq_inv
+            sigma_sq = dict()
+            sigma_sq['Value'] = float(m * Lambda) / sigma_sq_inv
+            sigma_sq['Lamba'] = Lambda
+            sigma_sq['m'] = m
 
-            sigma_sq.Lamba = Lambda
-            sigma_sq.m = m
             return sigma_sq
         Sigma_Sq = SigmaPrior()
 
         Epsilon_vec = rand.randn(TrainLen)
         # this following initialization of H comes from Eq. (10.20) in [Tsay; 2002]
-        H = np.square((TrainData['vwretd'] - Beta[0] - Beta[1] * TrainData['tbill']) / Epsilon_vec)
+        H = np.square((TrainData['vwretd'] - Beta['Value'][0] - Beta['Value'][1] * TrainData['tbill']) / Epsilon_vec)
 
         self.Beta = Beta
         self.Alpha = Alpha
@@ -84,22 +81,21 @@ class PriorParameters:
         self.H = H
         print('{0}\n[INFO] Finished initialization of parameters.'.format('=' * 20 + NOW() + '=' * 20))
 
-rwData = ReadData(SplitYear=2013)
-TrainDF=rwData.train[['vwretd','tbill']]
-Priors = PriorParameters(TrainDF)
-
-def UpdateParameters(Parameters=Priors):
+def UpdateParameters(Parameters):
     X_Vec = TrainDF['tbill']
     R_Vec = TrainDF['vwretd']
 
     def UpdateBeta():
-        OldMean = Parameters.Beta.MeanVec
-        OldCov = Parameters.Beta.CovMat
+        OldMean = Parameters.Beta['Mean']
+        OldCov = Parameters.Beta['Cov']
         # this following updating scheme comes from Page 419 in [Tsay; 2002]
         NewCov = np.invert(np.dot(np.transpose(X_Vec),X_Vec)+np.invert(OldCov))
         NewMean = np.dot(NewCov, np.dot(np.transpose(X_Vec), R_Vec) + np.dot(np.invert(OldCov),OldMean))
-
-        NewBeta = rand.multivariate_normal(mean=NewMean,cov=NewCov,size=2)
+        NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov,size=2)
+        NewBeta = dict()
+        NewBeta['Value'] = NewValue
+        NewBeta['Mean'] = NewMean
+        NewBeta['Cov'] = NewCov
         return NewBeta
     Parameters.Beta = UpdateBeta()
 
@@ -110,3 +106,8 @@ def UpdateParameters(Parameters=Priors):
 
     Parameters.Sigma_Sq
     Parameters.H
+
+rwData = ReadData(SplitYear=2013)
+TrainDF=rwData.train[['vwretd','tbill']]
+Priors = PriorParameters(TrainDF)
+UpdateParameters(Priors)
