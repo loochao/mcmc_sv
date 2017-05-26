@@ -14,30 +14,48 @@ from datetime import datetime
 def NOW():
     return str(datetime.now())[:-7]
 
+def Standardize(dfSerie):
+    STD = dfSerie.std()
+    MEAN = dfSerie.mean()
+    return (dfSerie-MEAN)/STD
+
 class ReadData:
     def __init__(self,SplitYear=2013):
         file_loc = r"https://raw.githubusercontent.com/jiacheng0409/mcmc_sv/master/sp_daily.csv"
         rwData = pd.read_csv(file_loc)
+        rwData['vwretd'] = Standardize(rwData['vwretd'])
+        rwData['tbill'] = Standardize(rwData['tbill'])
+
         train_IDX = rwData['caldt'] > SplitYear*(10**4)
         self.train = rwData[train_IDX]
         self.test = rwData[~train_IDX]
         print('{0}\n[INFO] Finished data importing.'.format('='*20+NOW()+'='*20))
 
 class PriorParameters:
-    def __init__(self, TrainSerie,Seed = rand.randint(1)):
+    def __init__(self, TrainData,Seed = rand.randint(1)):
         rand.seed(Seed)
-        TrainLen = len(TrainSerie)
-        Mu = rand.randn()
+        TrainLen = TrainData.shape[0]
+
+        def BetaPrior():
+            MeanVec = rand.rand(2)
+            CovMat = np.abs(rand.rand(2, 2))
+            Beta = rand.multivariate_normal(mean=MeanVec, cov=CovMat,size=2)
+
+            Beta.MeanVec = MeanVec
+            Beta.CovMat = CovMat
+            return Beta
+        Beta = BetaPrior()
+
         def AlphaPrior():
             MeanVec = rand.rand(2)
             CovMat = np.abs(rand.rand(2, 2))
-            Alpha = rand.multivariate_normal(mean=MeanVec,cov=CovMat)
+            Alpha = rand.multivariate_normal(mean=MeanVec,cov=CovMat,size=2)
 
             Alpha.MeanVec = MeanVec
             Alpha.CovMat = CovMat
             return Alpha
         Alpha = AlphaPrior()
-        # this abs(Alpha_2) <= 1 constraint make sure our AR(1) for volatility is stationary
+        # this abs(Alpha_2) <= 1 constraint makes sure that our AR(1) for volatility is stationary
         while np.abs(Alpha[1]>=1):  Alpha = AlphaPrior()
 
         def SigmaPrior():
@@ -53,20 +71,34 @@ class PriorParameters:
         Sigma_Sq = SigmaPrior()
 
         Epsilon_vec = rand.randn(TrainLen)
-        H = np.sqrt(np.abs((TrainSerie - Mu)/Epsilon_vec))
+        # this following initialization of H comes from Eq. (10.20) in [Tsay; 2002]
+        H = np.square((TrainData['vwretd'] - Beta[0] - Beta[1] * TrainData['tbill']) / Epsilon_vec)
 
-        self.Mu = Mu
+        self.Beta = Beta
         self.Alpha = Alpha
         self.Sigma_Sq = Sigma_Sq
         self.H = H
         print('{0}\n[INFO] Finished initialization of parameters.'.format('=' * 20 + NOW() + '=' * 20))
 
 rwData = ReadData(SplitYear=2013)
-TrainSerie=rwData.train['vwretd']
-Priors = PriorParameters(TrainSerie)
+TrainDF=rwData.train[['vwretd','tbill']]
+Priors = PriorParameters(TrainDF)
 
 def UpdateParameters(Parameters=Priors):
-    Parameters.Mu = rand.randn()
+    X_Vec = TrainDF['tbill']
+    R_Vec = TrainDF['vwretd']
+
+    def UpdateBeta():
+        OldMean = Parameters.Beta.MeanVec
+        OldCov = Parameters.Beta.CovMat
+        # this following updating scheme comes from Page 419 in [Tsay; 2002]
+        NewCov = np.invert(np.dot(np.transpose(X_Vec),X_Vec)+np.invert(OldCov))
+        NewMean = np.dot(NewCov, np.dot(np.transpose(X_Vec), R_Vec) + np.dot(np.invert(OldCov),OldMean))
+
+        NewBeta = rand.multivariate_normal(mean=NewMean,cov=NewCov,size=2)
+        return NewBeta
+    Parameters.Beta = UpdateBeta()
+
     Parameters.Alpha
     Parameters.Sigma_Sq
     Parameters.H
