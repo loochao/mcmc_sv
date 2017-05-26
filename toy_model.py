@@ -79,6 +79,7 @@ class PriorParameters:
         # this following initialization of H comes from Eq. (10.20) in [Tsay; 2002]
         H = np.square((TrainData['vwretd'] - Beta['Value'][0] - Beta['Value'][1] * TrainData['tbill']) / Epsilon_vec)
         H[H == 0] = 1e-5 # because we wish to calculate log of H_i's, we need to avoid zeros
+        H = H.tolist()
 
         self.Beta = Beta
         self.Alpha = Alpha
@@ -116,8 +117,8 @@ def UpdateParameters(Parameters):
         Z_Mat = np.array([[1]*len(Log_Lag1_PrioH),Log_Lag1_PrioH.tolist()])
         NewCov = invert(np.dot(Z_Mat, np.transpose(Z_Mat))/Sigma_Sq + invert(OldCov))
         NewMean = np.dot(NewCov, np.dot(Z_Mat, np.transpose(Log_PriorH))/Sigma_Sq + np.dot(invert(OldCov),OldMean))
-
         NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov)
+
         NewAlpha = {
             'Value': NewValue,
             'Mean': NewMean,
@@ -142,7 +143,7 @@ def UpdateParameters(Parameters):
 
     def UpdateH():
         Alpha = Parameters.Alpha['Value']
-        HVec = Parameters.H.tolist()[:]
+        HVec = Parameters.H[:]
 
         def CalcPI(H_This, H_Minus, H_Plus):
             PART1 = (R_Vec.iloc[idx] - X_Vec.iloc[idx] * Parameters.Beta['Value'][1]) ** 2 / (2 * H_This)
@@ -183,3 +184,4 @@ Priors = PriorParameters(TrainDF)
 NRound = 100
 for round in range(NRound):
     UpdateParameters(Priors)
+    print('{0}\n[INFO] Finished {1}th round of updating parameters using MCMC.'.format('='*20+NOW()+'='*20, round+1))
