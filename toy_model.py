@@ -84,11 +84,12 @@ class PriorParameters:
 def UpdateParameters(Parameters):
     X_Vec = TrainDF['tbill']
     R_Vec = TrainDF['vwretd']
-
+    Prior_H_Vec = Parameters.H
+    Prior_H_Lag1_Vec = pd.concat(Prior_H_Vec[0],Prior_H_Vec[:-1])
     def UpdateBeta():
         OldMean = Parameters.Beta['Mean']
         OldCov = Parameters.Beta['Cov']
-        # this following updating scheme comes from Page 419 in [Tsay; 2002]
+        # this following updating algorithm comes from Page 419 in [Tsay; 2002]
         NewCov = np.invert(np.dot(np.transpose(X_Vec),X_Vec)+np.invert(OldCov))
         NewMean = np.dot(NewCov, np.dot(np.transpose(X_Vec), R_Vec) + np.dot(np.invert(OldCov),OldMean))
         NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov,size=2)
@@ -100,6 +101,8 @@ def UpdateParameters(Parameters):
     Parameters.Beta = UpdateBeta()
 
     def UpdateAlpha():
+        # this following updating algorithm comes from Page 420 in [Tsay; 2002]
+        Z_Mat = pd.concat([np.ones_like(Prior_H_Vec), Prior_H_Lag1_Vec], axis=1)
         NewAlpha = 0
         return NewAlpha
     Parameters.Alpha = UpdateAlpha()
