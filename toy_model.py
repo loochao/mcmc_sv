@@ -31,6 +31,12 @@ class ReadData:
         self.test = rwData[~train_IDX]
         print('{0}\n[INFO] Finished data importing.'.format('='*20+NOW()+'='*20))
 
+class JointlyGussian:
+    def __init__(self,Value,Mean,Cov):
+        self.Value = Value
+        self.Mean = Mean
+        self.Cov = Cov
+
 class PriorParameters:
     def __init__(self, TrainData,Seed = rand.randint(1)):
         rand.seed(Seed)
@@ -39,20 +45,18 @@ class PriorParameters:
         def BetaPrior():
             MeanVec = rand.rand(2)
             CovMat = np.abs(rand.rand(2, 2))
-            Beta = rand.multivariate_normal(mean=MeanVec, cov=CovMat,size=2)
-
-            Beta.MeanVec = MeanVec
-            Beta.CovMat = CovMat
+            Beta = JointlyGussian(Value=rand.multivariate_normal(mean=MeanVec, cov=CovMat,size=2),
+                                  Mean=MeanVec,
+                                  Cov=CovMat)
             return Beta
         Beta = BetaPrior()
 
         def AlphaPrior():
             MeanVec = rand.rand(2)
             CovMat = np.abs(rand.rand(2, 2))
-            Alpha = rand.multivariate_normal(mean=MeanVec,cov=CovMat,size=2)
-
-            Alpha.MeanVec = MeanVec
-            Alpha.CovMat = CovMat
+            Alpha = JointlyGussian(Value=rand.multivariate_normal(mean=MeanVec,cov=CovMat,size=2),
+                                   Mean=MeanVec,
+                                   Cov=CovMat)
             return Alpha
         Alpha = AlphaPrior()
         # this abs(Alpha_2) <= 1 constraint makes sure that our AR(1) for volatility is stationary
@@ -99,6 +103,10 @@ def UpdateParameters(Parameters=Priors):
         return NewBeta
     Parameters.Beta = UpdateBeta()
 
-    Parameters.Alpha
+    def UpdateAlpha():
+        NewAlpha = 0
+        return NewAlpha
+    Parameters.Alpha = UpdateAlpha()
+
     Parameters.Sigma_Sq
     Parameters.H
