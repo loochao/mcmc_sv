@@ -7,6 +7,10 @@ Created on Fri May 26 02:55:27 2017
 
 from __future__ import print_function
 
+import os
+import re
+import pickle
+import argparse
 import pandas as pd
 import numpy as np
 import numpy.random as rand
@@ -17,6 +21,8 @@ from datetime import datetime
 
 def NOW():
     return str(datetime.now())[:-7]
+def NOWDIGIT():
+    return re.sub(pattern='[-: ]*',repl="",string=NOW())
 
 def Standardize(dfSerie):
     STD = dfSerie.std()
@@ -87,7 +93,7 @@ class PriorParameters:
         self.H = H
         print('{0}\n[INFO] Finished initialization of parameters.'.format('=' * 20 + NOW() + '=' * 20))
 
-def UpdateParameters(Parameters):
+def UpdateParameters(Parameters, TrainDF):
 
     X_Vec = TrainDF['tbill']
     R_Vec = TrainDF['vwretd']
@@ -172,22 +178,38 @@ def UpdateParameters(Parameters):
             if Q_New * Pi_Old != 0:
                 AcceptProbability = 1
             else:
-                AcceptProbability = min([Pi_New * Q_Old / Pi_Old * Q_New , 1])
+                AcceptProbability = min([Pi_New * Q_Old / (Pi_Old * Q_New) , 1])
 
             if rand.uniform(low=0, high=1)<=AcceptProbability:  HVec[idx] = H_Draw
 
         return HVec
     Parameters.H = UpdateH()
 
-rwData = ReadData(SplitYear=2013)
-TrainDF=rwData.train[['vwretd','tbill']]
-Priors = PriorParameters(TrainDF)
-NRound = 100
+def main(NRound):
+    rwData = ReadData(SplitYear=2013)
+    TrainDF = rwData.train[['vwretd', 'tbill']]
+    Priors = PriorParameters(TrainDF)
 
-#TODO: Parallel running
-for round in range(NRound):
-    UpdateParameters(Priors)
-    print('{0}\n[INFO] Finished {1}th round of updating parameters using MCMC.'.format('='*20+NOW()+'='*20, round+1))
+    #TODO: Explore possibilities of parallel running
 
-#TODO: Prediction and evaluation function
-print('{0}\n[INFO] Successfully exit the program.'.format('='*20+NOW()+'='*20))
+    for round in range(NRound):
+        UpdateParameters(Priors, TrainDF)
+        print('{0}\n[INFO] Finished {1}th round of updating parameters using MCMC.'.format('='*20+NOW()+'='*20, round+1))
+    FileName = 'TrainedResults_'+NOWDIGIT()+'.pkl'
+    with open(FileName, 'w') as OUTPUT:
+        pickle.dump(Priors, OUTPUT, pickle.HIGHEST_PROTOCOL)
+    print('{0}\n[INFO] MCMC training results are stored at {1}.'.format('=' * 20 + NOW() + '=' * 20,
+                                                                        os.path.join(os.getcwd(),FileName)))
+    #TODO: Prediction and evaluation function
+    print('{0}\n[INFO] Successfully exit the program.'.format('='*20+NOW()+'='*20))
+
+#TODO: Add command line tool
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Write txt data into HDF5')
+    parser.add_argument('-r', action='store', dest='NRound', default='100',
+                        help='This argument helps specifies how many iterations we run MCMC.\n'+
+                             'If you have input a decimal number, the code will take the floor int.')
+    args = parser.parse_args()
+    NRound = int(args.NRound)
+    assert (args.NRound >0), '[ERROR] Please give a valid simulation iterations command (i.e. must be positive)!'
+    main(NRound)
