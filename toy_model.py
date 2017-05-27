@@ -195,10 +195,10 @@ def main(NRound, NTrial):
 
     #TODO: Explore possibilities of parallel running
     # -----------------Training----------------
-    AverageContainer = {'Alpha':np.empty(shape=NTrial),
-                        'Beta':np.empty(shape=NTrial),
+    AverageContainer = {'Alpha':np.empty(shape=(NTrial,2)),
+                        'Beta':np.empty(shape=(NTrial,2)),
                         'Sigma_Sq':np.empty(shape=NTrial),
-                        'H': np.empty(shape=(NTrial))
+                        'H': np.empty(shape=NTrial)
                         }
 
     for trial in range(NTrial):
@@ -216,6 +216,7 @@ def main(NRound, NTrial):
         AverageContainer['H'][trial] = Priors.H[-1]
 
     OptimalParameters = {Variable:np.mean(AverageContainer[Variable]) for Variable in AverageContainer.keys()}
+    print('{0}\n[INFO] Training results:{1}'.format('=' * 20 + NOW() + '=' * 20, OptimalParameters))
     #---------------Prediction----------------
     #TODO: Prediction and evaluation function
 
