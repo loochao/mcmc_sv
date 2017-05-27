@@ -14,6 +14,8 @@ import argparse
 import pandas as pd
 import numpy as np
 import numpy.random as rand
+import math
+from operator import sub
 
 from scipy.stats import gamma
 from numpy.linalg import inv as invert
@@ -108,6 +110,7 @@ def UpdateParameters(Parameters, TrainDF):
         NewCov = invert(np.dot(np.transpose(X_Vec),X_Vec)+invert(OldCov))
         NewMean = np.dot(NewCov, np.dot(np.transpose(X_Vec), R_Vec) + np.dot(invert(OldCov),OldMean))
         NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov)
+
         NewBeta = {
             'Value' : NewValue,
             'Mean' : NewMean,
@@ -168,6 +171,7 @@ def UpdateParameters(Parameters, TrainDF):
             H_Plus = HVec[idx+1]
 
             # the following acception/rejection scheme is called 'Metropolis Algorithm'
+            # see updating scheme on pg. 419 of Tsay
             Pi_Old = CalcPI(H_This, H_Minus, H_Plus)
             Q_Old = gamma.pdf(H_This,1)
 
@@ -189,6 +193,7 @@ def main(NRound, NTrial):
     #-------------Data Preparations-----------
     rwData = ReadData(SplitYear=2013)
     TrainDF = rwData.train[['vwretd', 'tbill']]
+    TestDF = rwData.test[['vwretd','tbill']]
 
     #-------------Initializing Priors----------
     Priors = PriorParameters(TrainDF)
@@ -217,8 +222,27 @@ def main(NRound, NTrial):
 
     OptimalParameters = {Variable:np.mean(AverageContainer[Variable]) for Variable in AverageContainer.keys()}
     print('{0}\n[INFO] Training results:{1}'.format('=' * 20 + NOW() + '=' * 20, OptimalParameters))
+   
     #---------------Prediction----------------
     #TODO: Prediction and evaluation function
+    TestLen = TestDF.shape[0]
+    Epsilon_vec = rand.randn(TestLen)
+    
+    # this following initialization of H comes from Eq. (10.20) in [Tsay; 2002]
+    Alpha_0, Alpha_1 = OptimalParameters['Alpha']
+    Beta_0, Beta_1 = OptimalParameters['Beta']
+    H_0 = OptimalParameters['H']
+    R_Vec = [1] * TestLen
+    Residuals = [1] * TestLen
+    for i in TestLen:
+        V_t = (OptimalParameters['Sigma_Sq']**0.5)*rand.randn()
+        H = np.exp(Alpha_0 + np.log(H_0) * Alpha_1 + V_t)
+        A = np.sqrt(H) * Epsilon_vec[i]
+        R_Vec[i] = Beta_0 + Beta_1 * TestData['tbill'][i] + A
+        H_0 = H
+    Residuals = map(sub, TestData['vwretd'], R_Vec)
+    print(Residuals)
+
 
     print('{0}\n[INFO] Successfully exit the program.'.format('='*20+NOW()+'='*20))
 
