@@ -88,6 +88,7 @@ class PriorParameters:
         print('{0}\n[INFO] Finished initialization of parameters.'.format('=' * 20 + NOW() + '=' * 20))
 
 def UpdateParameters(Parameters):
+
     X_Vec = TrainDF['tbill']
     R_Vec = TrainDF['vwretd']
     Log_PriorH = np.log(Parameters.H)
@@ -168,7 +169,7 @@ def UpdateParameters(Parameters):
             Pi_New = CalcPI(H_Draw, H_Minus, H_Plus)
             Q_New = gamma.pdf(H_Draw,1)
 
-            if Q_New * Pi_Old <> 0:
+            if Q_New * Pi_Old != 0:
                 AcceptProbability = 1
             else:
                 AcceptProbability = min([Pi_New * Q_Old / Pi_Old * Q_New , 1])
@@ -182,8 +183,11 @@ rwData = ReadData(SplitYear=2013)
 TrainDF=rwData.train[['vwretd','tbill']]
 Priors = PriorParameters(TrainDF)
 NRound = 100
+
+#TODO: Parallel running
 for round in range(NRound):
     UpdateParameters(Priors)
     print('{0}\n[INFO] Finished {1}th round of updating parameters using MCMC.'.format('='*20+NOW()+'='*20, round+1))
 
+#TODO: Prediction and evaluation function
 print('{0}\n[INFO] Successfully exit the program.'.format('='*20+NOW()+'='*20))
