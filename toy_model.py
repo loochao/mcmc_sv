@@ -185,31 +185,55 @@ def UpdateParameters(Parameters, TrainDF):
         return HVec
     Parameters.H = UpdateH()
 
-def main(NRound):
+def main(NRound, NTrial):
+    #-------------Data Preparations-----------
     rwData = ReadData(SplitYear=2013)
     TrainDF = rwData.train[['vwretd', 'tbill']]
+
+    #-------------Initializing Priors----------
     Priors = PriorParameters(TrainDF)
 
     #TODO: Explore possibilities of parallel running
+    # -----------------Training----------------
+    AverageContainer = {'Alpha':np.empty(shape=NTrial),
+                        'Beta':np.empty(shape=NTrial),
+                        'Sigma_Sq':np.empty(shape=NTrial),
+                        'H': np.empty(shape=(NTrial))
+                        }
 
-    for round in range(NRound):
-        UpdateParameters(Priors, TrainDF)
-        print('{0}\n[INFO] Finished {1}th round of updating parameters using MCMC.'.format('='*20+NOW()+'='*20, round+1))
-    FileName = 'TrainedResults_'+NOWDIGIT()+'.pkl'
-    with open(FileName, 'w') as OUTPUT:
-        pickle.dump(Priors, OUTPUT, pickle.HIGHEST_PROTOCOL)
-    print('{0}\n[INFO] MCMC training results are stored at {1}.'.format('=' * 20 + NOW() + '=' * 20,
-                                                                        os.path.join(os.getcwd(),FileName)))
+    for trial in range(NTrial):
+        for round in range(NRound):
+            UpdateParameters(Priors, TrainDF)
+            print('{0}\n[INFO] Finished {1}th round of updating parameters using MCMC.'.format('='*20+NOW()+'='*20, round+1))
+        FileName = 'TrainedResults_'+NOWDIGIT()+'.pkl'
+        with open(FileName, 'w') as OUTPUT:
+            pickle.dump(Priors, OUTPUT, pickle.HIGHEST_PROTOCOL)
+        print('{0}\n[INFO] MCMC training results are stored at {1}.'.format('=' * 20 + NOW() + '=' * 20,
+                                                                            os.path.join(os.getcwd(),FileName)))
+        AverageContainer['Alpha'][trial] = Priors.Alpha['Value']
+        AverageContainer['Beta'][trial] = Priors.Beta['Value']
+        AverageContainer['Sigma_Sq'][trial] = Priors.Sigma_Sq['Value']
+        AverageContainer['H'][trial] = Priors.H[-1]
+
+    OptimalParameters = {Variable:np.mean(AverageContainer[Variable]) for Variable in AverageContainer.keys()}
+    #---------------Prediction----------------
     #TODO: Prediction and evaluation function
+
     print('{0}\n[INFO] Successfully exit the program.'.format('='*20+NOW()+'='*20))
 
-#TODO: Add command line tool
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Write txt data into HDF5')
+
     parser.add_argument('-r', action='store', dest='NRound', default='100',
-                        help='This argument helps specifies how many iterations we run MCMC.\n'+
+                        help='This argument helps specifies how many iterations we run within MCMC.\n'+
                              'If you have input a decimal number, the code will take the floor int.')
+
+    parser.add_argument('-t', action='store', dest='NTrial', default='10',
+                        help='This argument helps specifies how many iterations we run the entire MCMC.\n' +
+                             'If you have input a decimal number, the code will take the floor int.')
+
     args = parser.parse_args()
     NRound = int(args.NRound)
-    assert (args.NRound >0), '[ERROR] Please give a valid simulation iterations command (i.e. must be positive)!'
-    main(NRound)
+    NTrial = int(args.NTrial)
+    assert (args.NRound>0) and (args.NTrial>0), '[ERROR] Please give a valid simulation iterations command (i.e. must be positive)!'
+    main(NRound, NTrial)
