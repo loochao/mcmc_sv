@@ -239,14 +239,14 @@ def main(NRound, NTrial):
     Beta_0, Beta_1 = OptimalParameters['Beta']
     H_0 = OptimalParameters['H']
     R_Vec = [1] * TestLen
-    Residuals = [1] * TestLen
+
     for i in TestLen:
         V_t = (OptimalParameters['Sigma_Sq']**0.5)*rand.randn()
         H = np.exp(Alpha_0 + np.log(H_0) * Alpha_1 + V_t)
         A = np.sqrt(H) * Epsilon_vec[i]
-        R_Vec[i] = Beta_0 + Beta_1 * TestData['tbill'][i] + A
+        R_Vec[i] = Beta_0 + Beta_1 * TestDF['tbill'][i] + A
         H_0 = H
-    Residuals = map(sub, TestData['vwretd'], R_Vec)
+    Residuals = map(sub, TestDF['vwretd'], R_Vec)
     print(Residuals)
 
 
