@@ -38,7 +38,7 @@ class ReadData:
 
         # the following three lines make sure we use lag_1 period t-bill yields as exogenous variable
         temp = rwData['tbill'].shift(periods=1)
-        temp.iloc[0] = rwData.iloc[0].copy()
+        temp.iloc[0] = rwData['tbill'].iloc[0].copy()
         rwData['tbill'] = temp
 
         train_IDX = rwData['caldt'] > SplitYear*(10**4)
@@ -102,6 +102,7 @@ def UpdateParameters(Parameters, TrainDF):
 
     X_Vec = TrainDF['tbill']
     R_Vec = TrainDF['vwretd']
+    X_Mat = np.array([np.ones_like(X_Vec), X_Vec])
     Log_PriorH = np.log(Parameters.H)
     Lag1_IDX = [0]+range(len(Log_PriorH)-1)
     Log_Lag1_PrioH = Log_PriorH[Lag1_IDX]
@@ -110,8 +111,8 @@ def UpdateParameters(Parameters, TrainDF):
         # this following updating algorithm comes from Page 419 in [Tsay; 2002]
         OldMean = Parameters.Beta['Mean']
         OldCov = Parameters.Beta['Cov']
-        NewCov = invert(np.dot(np.transpose(X_Vec),X_Vec)+invert(OldCov))
-        NewMean = np.dot(NewCov, np.dot(np.transpose(X_Vec), R_Vec) + np.dot(invert(OldCov),OldMean))
+        NewCov = invert(np.dot(X_Mat,np.transpose(X_Mat))+invert(OldCov))
+        NewMean = np.dot(NewCov, np.dot(X_Mat, R_Vec) + np.dot(invert(OldCov),OldMean))
         NewValue = rand.multivariate_normal(mean=NewMean,cov=NewCov)
         NewBeta = {
             'Value' : NewValue,
