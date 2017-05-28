@@ -36,6 +36,11 @@ class ReadData:
         rwData['vwretd'] = Standardize(rwData['vwretd'])
         rwData['tbill'] = Standardize(rwData['tbill'])
 
+        # the following three lines make sure we use lag_1 period t-bill yields as exogenous variable
+        temp = rwData['tbill'].shift(periods=1)
+        temp.iloc[0] = rwData.iloc[0].copy()
+        rwData['tbill'] = temp
+
         train_IDX = rwData['caldt'] > SplitYear*(10**4)
         self.train = rwData[train_IDX]
         self.test = rwData[~train_IDX]
