@@ -14,8 +14,7 @@ import argparse
 import pandas as pd
 import numpy as np
 import numpy.random as rand
-import math
-from operator import sub
+import matplotlib.pyplot as plt
 
 from scipy.stats import gamma
 from numpy.linalg import inv as invert
@@ -225,41 +224,50 @@ def main(NRound, NTrial):
         AverageContainer['Beta'][trial] = Priors.Beta['Value']
         AverageContainer['Sigma_Sq'][trial] = Priors.Sigma_Sq['Value']
         AverageContainer['H'][trial] = Priors.H[-1]
-
-    OptimalParameters = {Variable:np.mean(AverageContainer[Variable]) for Variable in AverageContainer.keys()}
+    OptimalParameters = {
+        'Alpha' : np.mean(AverageContainer['Alpha'],axis=0),
+        'Beta': np.mean(AverageContainer['Beta'], axis=0),
+        'Sigma_Sq': np.mean(AverageContainer['Sigma_Sq']),
+        'H': np.mean(AverageContainer['H'])
+    }
     print('{0}\n[INFO] Training results:{1}'.format('=' * 20 + NOW() + '=' * 20, OptimalParameters))
    
     #---------------Prediction----------------
-    #TODO: Prediction and evaluation function
     TestLen = TestDF.shape[0]
     Epsilon_vec = rand.randn(TestLen)
     
     # this following initialization of H comes from Eq. (10.20) in [Tsay; 2002]
     Alpha_0, Alpha_1 = OptimalParameters['Alpha']
     Beta_0, Beta_1 = OptimalParameters['Beta']
-    H_0 = OptimalParameters['H']
+    H_Last = OptimalParameters['H']
     R_Vec = [1] * TestLen
 
-    for i in TestLen:
+    for idx in range(TestLen):
         V_t = (OptimalParameters['Sigma_Sq']**0.5)*rand.randn()
-        H = np.exp(Alpha_0 + np.log(H_0) * Alpha_1 + V_t)
-        A = np.sqrt(H) * Epsilon_vec[i]
-        R_Vec[i] = Beta_0 + Beta_1 * TestDF['tbill'][i] + A
-        H_0 = H
-    Residuals = map(sub, TestDF['vwretd'], R_Vec)
-    print(Residuals)
+        H = np.exp(Alpha_0 + np.log(H_Last) * Alpha_1 + V_t)
+        A = np.sqrt(H) * Epsilon_vec[idx]
+        R_Vec[idx] = Beta_0 + Beta_1 * TestDF['tbill'][idx] + A
+        H_Last = H
 
-
-    print('{0}\n[INFO] Successfully exit the program.'.format('='*20+NOW()+'='*20))
+    #--------Evaluating the model: Calculation of MMSE-----------------
+    RESID = TestDF['vwretd']-R_Vec
+    Sq_RESID = np.square(RESID)
+    MMSE = np.mean(Sq_RESID)
+    # --------Evaluating the model: Calculation of R_Sq-----------------
+    SqSum_RESID = np.sum(Sq_RESID)
+    SqSum_TOTAL = np.sum(np.square( TestDF['vwretd'] - np.mean( TestDF['vwretd'])))
+    R_Sq = 1-(SqSum_RESID/SqSum_TOTAL)
+    print('{0}\n[INFO] Successfully exit the program with:\n* MMSE={1};\n* R_Sq={2}'.
+          format('='*20+NOW()+'='*20, MMSE, R_Sq))
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Write txt data into HDF5')
+    parser = argparse.ArgumentParser(description='Conducting MCMC.')
 
-    parser.add_argument('-r', action='store', dest='NRound', default='100',
+    parser.add_argument('-r', action='store', dest='NRound', default='300',
                         help='This argument helps specifies how many iterations we run within MCMC.\n'+
                              'If you have input a decimal number, the code will take the floor int.')
 
-    parser.add_argument('-t', action='store', dest='NTrial', default='10',
+    parser.add_argument('-t', action='store', dest='NTrial', default='2',
                         help='This argument helps specifies how many iterations we run the entire MCMC.\n' +
                              'If you have input a decimal number, the code will take the floor int.')
 
