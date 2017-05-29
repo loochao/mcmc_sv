@@ -77,13 +77,12 @@ class PriorParameters:
         def SigmaPrior():
             Lambda = rand.randn()
             m = rand.randint(low=1,high=10)
-            DegreeOfFreedom = TrainLen + m -1
+            DegreeOfFreedom = TrainLen + m - 1
             sigma_sq_inv = rand.chisquare(DegreeOfFreedom)
             sigma_sq = dict()
             sigma_sq['Value'] = float(m * Lambda) / sigma_sq_inv
             sigma_sq['Lambda'] = Lambda
             sigma_sq['m'] = m
-
             return sigma_sq
         Sigma_Sq = SigmaPrior()
 
