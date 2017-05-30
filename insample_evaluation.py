@@ -7,16 +7,16 @@ Created on Fri May 26 02:55:27 2017
 
 from __future__ import print_function
 
-import re
 import argparse
-import pandas as pd
+import re
+from datetime import datetime
+
 import numpy as np
 import numpy.random as rand
-import matplotlib.pyplot as plt
+import pandas as pd
 import statsmodels.api as sm
-from scipy.stats import gamma
 from numpy.linalg import inv as invert
-from datetime import datetime
+from scipy.stats import gamma
 
 
 def NOW():
@@ -89,11 +89,10 @@ class PriorParameters:
         def SigmaPrior():
             Lambda = 0.2
             m = 5
-            # DegreeOfFreedom = TrainLen + m - 1
-            # sigma_sq_inv = rand.chisquare(DegreeOfFreedom)
+            DegreeOfFreedom = TrainLen + m - 1
+            sigma_sq_inv = rand.chisquare(DegreeOfFreedom)
             sigma_sq = dict()
-            # sigma_sq['Value'] = float(m * Lambda) / sigma_sq_inv
-            sigma_sq['Value'] = 0.5
+            sigma_sq['Value'] = float(m * Lambda) / sigma_sq_inv
             sigma_sq['Lambda'] = Lambda
             sigma_sq['m'] = m
 
