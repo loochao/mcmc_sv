@@ -17,21 +17,19 @@ import pandas as pd
 import statsmodels.api as sm
 from numpy.linalg import inv as invert
 from scipy.stats import gamma
+from sklearn import metrics
 
 
 def NOW():
     return str(datetime.now())[:-7]
 
-
 def NOWDIGIT():
     return re.sub(pattern='[-: ]*', repl="", string=NOW())
-
 
 def Standardize(dfSerie):
     STD = dfSerie.std()
     MEAN = dfSerie.mean()
     return (dfSerie - MEAN) / STD
-
 
 class ReadData:
     def __init__(self, SplitYear=2013):
@@ -49,7 +47,6 @@ class ReadData:
         self.train = rwData[train_IDX]
         self.test = rwData[~train_IDX]
         print('{0}\n[INFO] Finished data importing.'.format('=' * 20 + NOW() + '=' * 20))
-
 
 class PriorParameters:
     def __init__(self, TrainData, Seed=rand.randint(1)):
@@ -252,7 +249,8 @@ def main(NRound, NTrial):
             # -------------Calculate the current RE, Sum_RE, MMSE and R_Sq
 
             B_Vec = Priors.Beta['Value'][0] + Priors.Beta['Value'][1] * X_Vec
-            Fitted_Vec = B_Vec
+            A_Vec = np.sqrt(Priors.H) * rand.randn(len(X_Vec))
+            Fitted_Vec = B_Vec + A_Vec
 
             RESID = TrainDF['vwretd'] - Fitted_Vec
             Sum_RESID = np.sum(RESID)
@@ -262,7 +260,7 @@ def main(NRound, NTrial):
             MSE = np.mean(Sq_RESID)
             MSE_Update = np.abs(MSE - Old_MSE)
 
-            R_Sq = np.sum(Sq_RESID) / float(TrainSqSum_TOTAL)
+            R_Sq = metrics.r2_score(y_true=TrainDF['vwretd'], y_pred=Fitted_Vec)
             RoundCount += 1
 
             print(
