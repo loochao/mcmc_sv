@@ -54,6 +54,7 @@ class PriorParameters:
         TrainLen = TrainData.shape[0]
 
         def BetaPrior():
+            # TODO: use GARCH output as initialized mean vector
             Y = TrainData['vwretd']
             X = TrainData['tbill']
             X = sm.add_constant(X)
@@ -71,6 +72,7 @@ class PriorParameters:
         Beta = BetaPrior()
 
         def AlphaPrior():
+            # TODO: use GARCH output as initialized mean vector
             MeanVec = [0.4, 0.8]
             CovMat = [[0.09, 0], [0, 0.04]]
             Alpha = dict()
