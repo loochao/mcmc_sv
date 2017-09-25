@@ -1,32 +1,39 @@
 import matplotlib as mpl
+# 'Agg' to forbid matplotlib from attempting at displaying image, which is not what we want for running this code on servers
 mpl.use('Agg')
+
 import pickle
+import glob
+import os
 import numpy as np
 import pymc3 as pm
 import matplotlib.pyplot as plt
 from pymc_fit import ReadData
-trained_file_path = r"/home/jasonzou/mcmc_sv/trained_trace.pkl"
-with open(trained_file_path,'rb') as trained_file_obj:
-    trained_trace = pickle.load(trained_file_obj)
 
-axes = pm.traceplot(trace=trained_trace)
-plt.title('Fig 1. Parameters in the model')
-axes[0][0].figure.savefig('parameters_plot.png')
+curr_dir = os.path.dirname(os.path.realpath(__file__))
+trained_file_paths = [os.path.abspath(fp) for fp in glob.glob(os.path.join(curr_dir,'*.pkl'))]
+for trained_file_path in trained_file_paths:
+    model_name = os.path.basename(trained_file_path)[:-4]
+    with open(trained_file_path,'rb') as trained_file_obj:
+        trained_trace = pickle.load(trained_file_obj)
 
-plt.figure()
-plt.title('Log volatility')
-plt.plot(trained_trace['s'].T, 'b', alpha=.03)
-plt.xlabel('Time')
-plt.ylabel('Log volatility')
-plt.title('Fig 2. ln(volatility)')
-plt.savefig('log_volatility.png')
+    axes = pm.traceplot(trace=trained_trace)
+    axes[0][0].figure.savefig('parameters_plot_{}.png'.format(model_name))
 
-returns = ReadData().train['vwretd'].as_matrix()
-plt.figure()
-plt.plot(np.abs(returns))
-plt.plot(np.exp(trained_trace['s'].T), 'r', alpha=.03)
-sd = np.exp(trained_trace['s'].T)
-plt.xlabel('Time')
-plt.ylabel('Returns')
-plt.title('Fig 3. Absolute returns and std. of volatility')
-plt.savefig('absr_sd.png')
+    plt.figure()
+    plt.title('Log volatility')
+    plt.plot(trained_trace['s'].T, 'b', alpha=.03)
+    plt.xlabel('Time')
+    plt.ylabel('Log volatility')
+    plt.title('Fig 2. ln(volatility)')
+    plt.savefig('log_volatility_{}.png'.format(model_name))
+
+    returns = ReadData().train['vwretd'].as_matrix()
+    plt.figure()
+    plt.plot(np.abs(returns))
+    plt.plot(np.exp(trained_trace['s'].T), 'r', alpha=.03)
+    sd = np.exp(trained_trace['s'].T)
+    plt.xlabel('Time')
+    plt.ylabel('Returns')
+    plt.title('Fig 3. Absolute returns and std. of volatility')
+    plt.savefig('absr_sd.png_{}'.format(model_name))
