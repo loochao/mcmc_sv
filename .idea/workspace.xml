@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c9f71202-9d47-485e-9457-2a591878bf56" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/manual_fit.py" afterPath="$PROJECT_DIR$/manual_fit.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pymc_analysis.py" afterPath="$PROJECT_DIR$/pymc_analysis.py" />
+    <list default="true" id="c9f71202-9d47-485e-9457-2a591878bf56" name="Default" comment="Fixed minor problems on naming the figures and allowed for graphings of mulitple trained models.">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pymc_fit.py" afterPath="$PROJECT_DIR$/pymc_fit.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -41,7 +39,7 @@
       <file leaf-file-name="manual_fit.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/manual_fit.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5405">
+            <state relative-caret-position="5681">
               <caret line="247" column="76" lean-forward="false" selection-start-line="247" selection-start-column="76" selection-end-line="247" selection-end-column="76" />
               <folding>
                 <element signature="e#130#167#0" expanded="true" />
@@ -53,8 +51,8 @@
       <file leaf-file-name="pymc_fit.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pymc_fit.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="667">
-              <caret line="107" column="25" lean-forward="false" selection-start-line="107" selection-start-column="25" selection-end-line="107" selection-end-column="25" />
+            <state relative-caret-position="262">
+              <caret line="98" column="79" lean-forward="false" selection-start-line="98" selection-start-column="79" selection-end-line="98" selection-end-column="79" />
               <folding>
                 <element signature="e#29#42#0" expanded="true" />
               </folding>
@@ -84,14 +82,12 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>DiscreteUninformative</find>
       <find>disasters_array</find>
       <find>determini</find>
       <find>sm</find>
       <find>observed</find>
       <find>;</find>
       <find>rwData</find>
-      <find>ReadData</find>
       <find>TestDF</find>
       <find>TrainLen</find>
       <find>meanvec</find>
@@ -114,6 +110,8 @@
       <find>halfnormal</find>
       <find>sigma</find>
       <find>tbill_lag</find>
+      <find>returns</find>
+      <find>ReadData</find>
     </findStrings>
     <replaceStrings>
       <replace>raw_df</replace>
@@ -122,6 +120,7 @@
       <replace>n_obs</replace>
       <replace>covariates</replace>
       <replace>response</replace>
+      <replace>logreturns</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -505,7 +504,14 @@
       <option name="project" value="LOCAL" />
       <updated>1506359514032</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Update data and code a bit.">
+      <created>1506567595332</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1506567595332</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TodoView">
@@ -523,17 +529,17 @@
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36979786" sideWeight="0.5043243" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3781213" sideWeight="0.49567568" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936978" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3781213" sideWeight="0.49567568" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24972972" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="R Packages" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="R Graphics" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32972974" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35315102" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32972974" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3183784" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -553,7 +559,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Using pymc3 library to reconstruct the model." />
     <MESSAGE value="Fixed minor problems on naming the figures and allowed for graphings of mulitple trained models." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed minor problems on naming the figures and allowed for graphings of mulitple trained models." />
+    <MESSAGE value="Update data and code a bit." />
+    <option name="LAST_COMMIT_MESSAGE" value="Update data and code a bit." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -980,7 +987,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/manual_fit.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5405">
+        <state relative-caret-position="5681">
           <caret line="247" column="76" lean-forward="false" selection-start-line="247" selection-start-column="76" selection-end-line="247" selection-end-column="76" />
           <folding>
             <element signature="e#130#167#0" expanded="true" />
@@ -1005,8 +1012,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pymc_fit.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="667">
-          <caret line="107" column="25" lean-forward="false" selection-start-line="107" selection-start-column="25" selection-end-line="107" selection-end-column="25" />
+        <state relative-caret-position="262">
+          <caret line="98" column="79" lean-forward="false" selection-start-line="98" selection-start-column="79" selection-end-line="98" selection-end-column="79" />
           <folding>
             <element signature="e#29#42#0" expanded="true" />
           </folding>
