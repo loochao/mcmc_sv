@@ -9,29 +9,24 @@ from datetime import datetime
 def now():  return str(datetime.now())[:-7]
 
 class ReadData:
-    def __init__(self, SplitYear=2013, yyyymmdd_colname = 'caldt'):
+    def __init__(self, SplitYear=2000, yyyymmdd_colname = 'caldt'):
         file_loc = r"https://raw.githubusercontent.com/jiacheng0409/mcmc_sv/master/sp_daily.csv"
         rwData = pd.read_csv(file_loc)
         yyyymmdd = rwData[yyyymmdd_colname]
         df_norm = (rwData - rwData.mean()) /rwData.std()
         df_norm[yyyymmdd_colname] = yyyymmdd
 
-        # the following three lines make sure we use lag_1 period t-bill yields as exogenous variable
-        temp = df_norm['tbill'].shift(periods=1)
-        temp.iloc[0] = df_norm['tbill'].iloc[0].copy()
-        df_norm['tbill_lag'] = temp
+        temp = df_norm['sprtrn'].shift(periods=1)
+        temp.iloc[0] = df_norm['sprtrn'].iloc[0].copy()
+        df_norm['sprtrn_lag'] = temp
 
-        temp = df_norm['vwretd'].shift(periods=1)
-        temp.iloc[0] = df_norm['vwretd'].iloc[0].copy()
-        df_norm['vwretd_lag'] = temp
-
-        train_IDX = df_norm[yyyymmdd_colname] > SplitYear * (10 ** 4)
+        train_IDX = df_norm[yyyymmdd_colname] <= SplitYear * (10 ** 4)
         self.train = df_norm[train_IDX]
         self.test = df_norm[~train_IDX]
         print('[INFO] Finished data importing.')
 
 def exponential_model(training_data_df):
-    returns = training_data_df['vwretd'].as_matrix()
+    returns = training_data_df['sprtrn'].as_matrix()
 
     with pm.Model() as model_obj:
         nu = pm.Exponential('nu', 1./10, testval=5.)
