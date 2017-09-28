@@ -1,6 +1,7 @@
 # Importing all dependencies
 import pickle
 import argparse
+import multiprocessing
 import numpy as np
 import pandas as pd
 import pymc3 as pm
@@ -23,7 +24,7 @@ class ReadData:
         train_IDX = (df_norm['DATE'] <= (EndYear+1) * (10 ** 4)) & (df_norm['DATE'] >= StartYear * (10 ** 4))
         self.train = df_norm[train_IDX]
         self.test = df_norm[~train_IDX]
-        print('[INFO] Finished data importing.')
+        print('[INFO {}] finished data importing.'.format(now()))
 
 def exponential_model(training_data_df):
     logreturns = training_data_df['logret'].as_matrix()
@@ -72,7 +73,7 @@ def hidden_vol_model(training_data_df):
                                sd=pm.math.sqrt(this_h),
                                observed=logreturns[t])
             r_list.append(this_r)
-    print('[INFO] hidden volatility model built.')
+    print('[INFO {}] hidden volatility model built.'.format(now()))
     return model_obj
 
 def main(StartYear, EndYear, n_draw, model):
@@ -86,7 +87,9 @@ def main(StartYear, EndYear, n_draw, model):
     else:
         raise NotImplementedError
 
-    with model_obj: trace = pm.sample(draws=n_draw)
+    n_cpus = multiprocessing.cpu_count()
+    print('[INFO {}] starts sampling on {} CPUs.'.format(now(), n_cpus))
+    with model_obj: trace = pm.sample(draws=1, njobs=n_cpus)
     pm.summary(trace)
 
     output_file = '{}_model_trace.pkl'.format(model)
@@ -101,7 +104,7 @@ if __name__ == '__main__':
 
     # Initialize random number generator
     np.random.seed(123)
-    print('[INFO] Code starts running at {}.\n'.format(now()))
+    print('[INFO {}] code starts running.\n'.format(now()))
     StartYear = 1962
     EndYear = 1999
     n_draw = 200
