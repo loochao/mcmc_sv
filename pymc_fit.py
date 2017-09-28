@@ -17,7 +17,7 @@ class ReadData:
         df_norm['DATE'] = yyyymmdd
 
         temp = df_norm['logret'].shift(periods=1)
-        temp.iloc[0] = df_norm['logret'].iloc[0].copy()
+        temp.iloc[0] = 0
         df_norm['logret_lag'] = temp
 
         train_IDX = (df_norm['DATE'] <= (EndYear+1) * (10 ** 4)) & (df_norm['DATE'] >= StartYear * (10 ** 4))
