@@ -1,0 +1,42 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Markov Chains}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Monte Carlo Simulation}{section.1}% 3
+\BOOKMARK [1][-]{section.2}{Bayesian Statistics}{}% 4
+\BOOKMARK [2][-]{subsection.2.1}{Preliminaries}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.2}{Application to modeling}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.3}{The prior distribution}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.4}{The likelihood}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.5}{The posterior distribution}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.6}{Extension to unobservable state variables}{section.2}% 10
+\BOOKMARK [1][-]{section.3}{Monte Carlo Markov Chains}{}% 11
+\BOOKMARK [2][-]{subsection.3.1}{Clifford Hammersley Theorem}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.2}{Algorithms}{section.3}% 13
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Gibbs sampler}{subsection.3.2}% 14
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Griddy Gibbs}{subsection.3.2}% 15
+\BOOKMARK [3][-]{subsubsection.3.2.3}{Metropolis-Hastings}{subsection.3.2}% 16
+\BOOKMARK [2][-]{subsection.3.3}{Convergence of MCMC methods}{section.3}% 17
+\BOOKMARK [1][-]{section.4}{Stochastic Volatility Models}{}% 18
+\BOOKMARK [2][-]{subsection.4.1}{Limitations of Vanilla GARCH}{section.4}% 19
+\BOOKMARK [2][-]{subsection.4.2}{Introduction of Stochastic Volatility Models}{section.4}% 20
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Diffusive Volatility Models}{subsection.4.2}% 21
+\BOOKMARK [3][-]{subsubsection.4.2.2}{SV Models with Jumps}{subsection.4.2}% 22
+\BOOKMARK [2][-]{subsection.4.3}{Estimations of SV Models Using MCMC}{section.4}% 23
+\BOOKMARK [3][-]{subsubsection.4.3.1}{General Approach of Estimating SV}{subsection.4.3}% 24
+\BOOKMARK [3][-]{subsubsection.4.3.2}{Where MCMC Comes Into Play}{subsection.4.3}% 25
+\BOOKMARK [1][-]{section.5}{Empirical MCMC Estimation of Stochastic Volatility Model}{}% 26
+\BOOKMARK [2][-]{subsection.5.1}{Data Preparations}{section.5}% 27
+\BOOKMARK [2][-]{subsection.5.2}{Formulations: Priors of the Model}{section.5}% 28
+\BOOKMARK [3][-]{subsubsection.5.2.1}{Beta Priors}{subsection.5.2}% 29
+\BOOKMARK [3][-]{subsubsection.5.2.2}{Alpha Priors}{subsection.5.2}% 30
+\BOOKMARK [3][-]{subsubsection.5.2.3}{Sigma Priors}{subsection.5.2}% 31
+\BOOKMARK [3][-]{subsubsection.5.2.4}{Volatility Priors}{subsection.5.2}% 32
+\BOOKMARK [2][-]{subsection.5.3}{Estimations: Posteriors using Gibbs and Metropolis}{section.5}% 33
+\BOOKMARK [3][-]{subsubsection.5.3.1}{Alpha Posteriors}{subsection.5.3}% 34
+\BOOKMARK [3][-]{subsubsection.5.3.2}{Beta Posteriors}{subsection.5.3}% 35
+\BOOKMARK [3][-]{subsubsection.5.3.3}{Sigma Posteriors}{subsection.5.3}% 36
+\BOOKMARK [3][-]{subsubsection.5.3.4}{Volatility Posteriors}{subsection.5.3}% 37
+\BOOKMARK [2][-]{subsection.5.4}{Predictions and Evaluations}{section.5}% 38
+\BOOKMARK [3][-]{subsubsection.5.4.1}{In-Sample Metrics}{subsection.5.4}% 39
+\BOOKMARK [3][-]{subsubsection.5.4.2}{Parameter Estimates}{subsection.5.4}% 40
+\BOOKMARK [2][-]{subsection.5.5}{Extendability of the Model}{section.5}% 41
+\BOOKMARK [1][-]{appendix.A}{Python Implementation of Our Empirical Estimation}{}% 42

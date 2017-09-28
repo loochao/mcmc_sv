@@ -247,9 +247,11 @@ def main(response_name, covariates_names, NRound, NTrial):
 
             R_Sq = metrics.r2_score(y_true=response.reshape((n_obs)), y_pred=Fitted_Vec)
             RoundCount += 1
+            if RoundCount % 100 == 1:
+                print('{0}\n[INFO] Finished {1}th round of updating parameters using MCMC with:\n * Mean Squared Error={2};\n * R2={3}%;\n'.
+                    format('=' * 20 + NOW() + '=' * 20, RoundCount, MSE, 100 * R_Sq))
+                print('[INFO] Scale of H vector is currently {};\n'.format(np.std(Priors.H)))
 
-            print('{0}\n[INFO] Finished {1}th round of updating parameters using MCMC with:\n * Mean Squared Error={2};\n * R2={3}%;\n'.
-                format('=' * 20 + NOW() + '=' * 20, RoundCount, MSE, 100 * R_Sq))
 
         if RoundCount > NRound:
             print('{0}\n[INFO] Successfully finished {1}th trial with convergence. Final in-sample statistics are:\n* Mean Squared Error={2}\n * R2={3}%\n'.
@@ -310,7 +312,7 @@ def main(response_name, covariates_names, NRound, NTrial):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Conducting MCMC.')
 
-    parser.add_argument('-r', action='store', dest='NRound', default='6000',
+    parser.add_argument('-r', action='store', dest='NRound', default='200000',
                         help='This argument helps specifies how many iterations we run within MCMC.\n' +
                              'If you have input a decimal number, the code will take the floor int.')
 

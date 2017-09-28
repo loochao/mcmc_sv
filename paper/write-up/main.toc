@@ -1,0 +1,43 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
+\contentsline {subsection}{\numberline {1.1}Markov Chains}{3}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Monte Carlo Simulation}{4}{subsection.1.2}
+\contentsline {section}{\numberline {2}Bayesian Statistics}{4}{section.2}
+\contentsline {subsection}{\numberline {2.1}Preliminaries}{4}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Application to modeling}{5}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}The prior distribution}{5}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}The likelihood}{6}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}The posterior distribution}{7}{subsection.2.5}
+\contentsline {subsection}{\numberline {2.6}Extension to unobservable state variables}{8}{subsection.2.6}
+\contentsline {section}{\numberline {3}Monte Carlo Markov Chains}{8}{section.3}
+\contentsline {subsection}{\numberline {3.1}Clifford Hammersley Theorem}{8}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Algorithms}{9}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}Gibbs sampler}{9}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}Griddy Gibbs}{9}{subsubsection.3.2.2}
+\contentsline {subsubsection}{\numberline {3.2.3}Metropolis-Hastings}{10}{subsubsection.3.2.3}
+\contentsline {subsection}{\numberline {3.3}Convergence of MCMC methods}{10}{subsection.3.3}
+\contentsline {section}{\numberline {4}Stochastic Volatility Models}{11}{section.4}
+\contentsline {subsection}{\numberline {4.1}Limitations of Vanilla GARCH}{11}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Introduction of Stochastic Volatility Models}{11}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}Diffusive Volatility Models}{11}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}SV Models with Jumps}{12}{subsubsection.4.2.2}
+\contentsline {subsection}{\numberline {4.3}Estimations of SV Models Using MCMC}{13}{subsection.4.3}
+\contentsline {subsubsection}{\numberline {4.3.1}General Approach of Estimating SV}{13}{subsubsection.4.3.1}
+\contentsline {subsubsection}{\numberline {4.3.2}Where MCMC Comes Into Play}{13}{subsubsection.4.3.2}
+\contentsline {section}{\numberline {5}Empirical MCMC Estimation of Stochastic Volatility Model}{15}{section.5}
+\contentsline {subsection}{\numberline {5.1}Data Preparations}{15}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Formulations: Priors of the Model}{15}{subsection.5.2}
+\contentsline {subsubsection}{\numberline {5.2.1}Beta Priors}{15}{subsubsection.5.2.1}
+\contentsline {subsubsection}{\numberline {5.2.2}Alpha Priors}{16}{subsubsection.5.2.2}
+\contentsline {subsubsection}{\numberline {5.2.3}Sigma Priors}{16}{subsubsection.5.2.3}
+\contentsline {subsubsection}{\numberline {5.2.4}Volatility Priors}{16}{subsubsection.5.2.4}
+\contentsline {subsection}{\numberline {5.3}Estimations: Posteriors using Gibbs and Metropolis}{16}{subsection.5.3}
+\contentsline {subsubsection}{\numberline {5.3.1}Alpha Posteriors}{16}{subsubsection.5.3.1}
+\contentsline {subsubsection}{\numberline {5.3.2}Beta Posteriors}{16}{subsubsection.5.3.2}
+\contentsline {subsubsection}{\numberline {5.3.3}Sigma Posteriors}{17}{subsubsection.5.3.3}
+\contentsline {subsubsection}{\numberline {5.3.4}Volatility Posteriors}{17}{subsubsection.5.3.4}
+\contentsline {subsection}{\numberline {5.4}Predictions and Evaluations}{17}{subsection.5.4}
+\contentsline {subsubsection}{\numberline {5.4.1}In-Sample Metrics}{17}{subsubsection.5.4.1}
+\contentsline {subsubsection}{\numberline {5.4.2}Parameter Estimates}{18}{subsubsection.5.4.2}
+\contentsline {subsection}{\numberline {5.5}Extendability of the Model}{18}{subsection.5.5}
+\contentsline {section}{\numberline {A}Python Implementation of Our Empirical Estimation}{19}{appendix.A}

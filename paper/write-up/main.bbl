@@ -1,0 +1,74 @@
+\begin{thebibliography}{13}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Box and Tiao(1973)]{tiao1973post}
+Box and Tiao.
+\newblock \emph{Bayesian Inference in Statistical Analysis}.
+\newblock John Wiley \& Sons, 1973.
+
+\bibitem[Eraker and Polson(2003)]{polson2003jumps}
+Johannes Eraker and Polson.
+\newblock The impacts of jumps in volatility and returns.
+\newblock \emph{The Journal of Finance}, 2003.
+
+\bibitem[Gelman()]{gelman2002}
+Andrew Gelman.
+\newblock Prior distribution.
+\newblock \emph{Encyclopedia of environmetrics}.
+
+\bibitem[Gelman et~al.(2008)]{gelman2008}
+Andrew Gelman et~al.
+\newblock Objections to bayesian statistics.
+\newblock \emph{Bayesian Analysis}, 3\penalty0 (3):\penalty0 445--449, 2008.
+
+\bibitem[Gilks(2005)]{gilks2005markov}
+Walter~R Gilks.
+\newblock Markov chain monte carlo.
+\newblock \emph{Encyclopedia of Biostatistics}, 2005.
+
+\bibitem[Grinstead and Snell(1997)]{grinstead1997}
+Charles~M Grinstead and J~Laurie Snell.
+\newblock Markov chains.
+\newblock \emph{Introduction to probability}, pages 405--470, 1997.
+
+\bibitem[Hansen and Lunde(2005)]{hansen2005garch}
+Hansen and Lunde.
+\newblock A forecast comparison of volatility models: Does anything beat a
+  garch(1,1)?
+\newblock \emph{Journal of Applied Econometrics}, 2005.
+
+\bibitem[Jacquier and Rossi(1994)]{rossi1994bayesian}
+Polson Jacquier and Rossi.
+\newblock Bayesian analysis of stochastic volatility models.
+\newblock \emph{Journal of Business and Economic Statistics}, 1994.
+
+\bibitem[Johannes and Polson(2003)]{johannes2003}
+Michael~S Johannes and Nick Polson.
+\newblock Mcmc methods for continuous-time financial econometrics.
+\newblock 2003.
+
+\bibitem[Lee(2012)]{lee2012bayesian}
+Peter~M Lee.
+\newblock \emph{Bayesian statistics: an introduction}.
+\newblock John Wiley \& Sons, 2012.
+
+\bibitem[Lehar and Schittenkopf(2001)]{lehar2001svgarch}
+Scheicher Lehar and Schittenkopf.
+\newblock Garch vs stochastic volatility: Option pricing and risk management.
+\newblock \emph{Journal of Banking and Finance}, 2001.
+
+\bibitem[Merton(1976)]{merton1976jumps}
+Merton.
+\newblock Option pricing when underlying stock returns are discontinuous.
+\newblock \emph{Journal of Financial Economics}, 1976.
+
+\bibitem[Tsay(2002)]{tsay2002}
+Ruey~S Tsay.
+\newblock Markov chain monte carlo methods with applications.
+\newblock \emph{Analysis of financial time series}, pages 395--443, 2002.
+
+\end{thebibliography}

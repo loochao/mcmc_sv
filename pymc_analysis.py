@@ -12,13 +12,16 @@ from pymc_fit import ReadData
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 trained_file_paths = [os.path.abspath(fp) for fp in glob.glob(os.path.join(curr_dir,'*.pkl'))]
+result_dir = os.path.dirname(curr_dir,'result')
+if not os.path.isdir(result_dir): os.mkdir(result_dir)
+
 for trained_file_path in trained_file_paths:
     model_name = os.path.basename(trained_file_path)[:-4]
     with open(trained_file_path,'rb') as trained_file_obj:
         trained_trace = pickle.load(trained_file_obj)
 
     axes = pm.traceplot(trace=trained_trace)
-    axes[0][0].figure.savefig('parameters_plot_{}.png'.format(model_name))
+    axes[0][0].figure.savefig(os.path.join(result_dir,'parameters_plot_{}.png'.format(model_name)))
 
     plt.figure()
     plt.title('Log volatility')
@@ -26,7 +29,7 @@ for trained_file_path in trained_file_paths:
     plt.xlabel('Time')
     plt.ylabel('Log volatility')
     plt.title('Fig 2. ln(volatility)')
-    plt.savefig('log_volatility_{}.png'.format(model_name))
+    plt.savefig(os.path.join(result_dir,'log_volatility_{}.png'.format(model_name)))
 
     returns = ReadData().train['vwretd'].as_matrix()
     plt.figure()
@@ -36,4 +39,4 @@ for trained_file_path in trained_file_paths:
     plt.xlabel('Time')
     plt.ylabel('Returns')
     plt.title('Fig 3. Absolute returns and std. of volatility')
-    plt.savefig('absr_sd.png_{}'.format(model_name))
+    plt.savefig(os.path.join(result_dir,'absr_sd_{}.png'.format(model_name)))

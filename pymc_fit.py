@@ -48,32 +48,42 @@ def hidden_vol_model(training_data_df):
 
     with pm.Model() as model_obj:
         n_obs = returns.shape[0]
-        epsilon = pm.Normal(name='epsilon', sd=1.0, shape=n_obs)
-        beta_vec = pm.Normal(name='beta_vec', sd=1.0, shape=3)
-        alpha_vec = pm.Normal(name='alpha_vec', sd=1.0, shape=2)
 
-        sigma_nu = 1
-        sigma_inv = pm.ChiSquared(name='sigma_inv', nu=sigma_nu)
-        sigma = pm.Deterministic(name='sigma', var=sigma_nu / sigma_inv)
+        epsilon = pm.Normal(name='epsilon', sd=1.0, mu=.0, shape=n_obs)
+        beta_vec = pm.Normal(name='beta_vec', sd=1.0, mu=.0, shape=3)
 
-        nu = pm.Normal(name='nu', sd=pm.math.sqrt(sigma), shape=n_obs)
+        alpha_0 = pm.HalfNormal(name='alpha_0',sd=1.0, shape=1)
+        ar_1_para = pm.Bound(pm.Normal, lower=-1.0 + 1e-6, upper=1.0 - 1e-6)
+        alpha_1 = ar_1_para('alpha_1', mu=0, sd=1)
+
+        # sigma_nu = 1.0
+        # sigma_inv = pm.ChiSquared(name='sigma_inv', nu=sigma_nu)
+        # sigma_sq = pm.Deterministic(name='sigma', var=sigma_nu/sigma_inv)
+        sigma_sq = pm.InverseGamma(name='sigma', alpha=2.0, shape=1)
+        # v = pm.Normal(name='v',sd=pm.math.sqrt(sigma_sq),shape=n_obs)
 
         ln_h_list = list()
         r_list = list()
-
         for t in range(n_obs):
             if t == 0:
-                this_ln_h = pm.HalfNormal(name='ln_h_{}'.format(t), sd=1.0)
-            else:
+                this_h = pm.HalfNormal(name='h_{}'.format(t), sd=1.0,shape=1)
                 this_ln_h = pm.Deterministic(name='ln_h_{}'.format(t),
-                                             var=alpha_vec[0] + alpha_vec[1] * ln_h_list[-1] + nu[t])
+                                             var=pm.math.log(this_h))
+            else:
+                this_ln_h = pm.Normal(name='ln_h_{}'.format(t),
+                                      mu=alpha_0 + alpha_1*this_ln_h,
+                                      sd=pm.math.sqrt(sigma_sq),
+                                      shape=1)
+                this_h = pm.Deterministic(name='h_{}'.format(t),
+                                          var=pm.math.exp(this_ln_h))
+
             ln_h_list.append(this_ln_h)
-            this_a = pm.Deterministic(name='a_{}'.format(t),
-                                      var=pm.math.sqrt(pm.math.exp(this_ln_h)) * epsilon[t])
             this_r = pm.Normal(name='r_{}'.format(t),
-                               mu=beta_vec[0] + beta_vec[1] * tbill_lag[t] + beta_vec[2] * returns_lag[t] + this_a,
+                               mu=beta_vec[0] + tbill_lag[t]*beta_vec[1]+ returns_lag[t]*beta_vec[2],
+                               sd=pm.math.sqrt(this_h),
                                observed=returns[t])
             r_list.append(this_r)
+    print('[INFO] hidden volatility model built.')
     return model_obj
 
 def main(split_year, n_draw, model):
