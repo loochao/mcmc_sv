@@ -1,4 +1,5 @@
 # Importing all dependencies
+import sys
 import pickle
 import argparse
 import multiprocessing
@@ -8,6 +9,7 @@ import pymc3 as pm
 from datetime import datetime
 
 def now():  return str(datetime.now())[:-7]
+sys.setrecursionlimit(n=100000)
 
 class ReadData:
     def __init__(self, StartYear = 1962, EndYear=1999):
@@ -89,7 +91,7 @@ def main(StartYear, EndYear, n_draw, model):
 
     n_cpus = multiprocessing.cpu_count()
     print('[INFO {}] starts sampling on {} CPUs.'.format(now(), n_cpus))
-    with model_obj: trace = pm.sample(draws=1, njobs=n_cpus)
+    with model_obj: trace = pm.sample(draws=n_draw, njobs=n_cpus)
     pm.summary(trace)
 
     output_file = '{}_model_trace.pkl'.format(model)
